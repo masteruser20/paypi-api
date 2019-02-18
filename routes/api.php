@@ -28,3 +28,5 @@ Route::get('methods', function () {
         $methods
     );
 });
+
+Route::resource('transactions', 'TransactionController');
