@@ -58,6 +58,28 @@ class TransactionTest extends TestCase
     }
 
     /**
+     * @return void
+     * @test
+     */
+    public function it_should_returns_correct_transaction_structure()
+    {
+       $this->generateTransactions(1);
+        $transactionId = Transaction::first()->id;
+        $response = $this->get('/api/transactions/' . $transactionId);
+        $response->assertStatus(200)
+            ->assertJson(['id' => $transactionId])
+            ->assertJsonStructure([
+                'id',
+                'provider',
+                'type',
+                'amount',
+                'status',
+                'currency',
+                'user',
+            ]);
+    }
+
+    /**
      * @test
      */
     public function it_should_returns_filtered_transactions()

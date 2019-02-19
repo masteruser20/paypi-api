@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\TransactionUser;
 use App\Http\Resources\TransactionCollection;
+use App\Transaction;
 use App\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
@@ -109,7 +110,15 @@ class TransactionController extends Controller
      */
     public function show($id)
     {
-        //
+        if (!is_numeric($id)) {
+            return response()->status(400);
+        }
+
+        if ($transaction = Transaction::find($id)) {
+            return response()->json(new \App\Http\Resources\Transaction($transaction));
+        }
+
+        return response()->noContent();
     }
 
     /**
