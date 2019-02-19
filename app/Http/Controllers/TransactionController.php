@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\Transaction;
+use App\Http\Resources\TransactionUser;
+use App\Http\Resources\TransactionCollection;
 use App\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -15,9 +17,24 @@ class TransactionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $query = \App\Transaction::query();
+        if ($request->has('order')) {
+            $key = filter_var(array_key_first($request->get('order')), FILTER_SANITIZE_STRING);
+            $value = filter_var(array_first($request->get('order')), FILTER_SANITIZE_STRING);
+            $query->orderBy($key, $value);
+        }
+
+        if ($request->has('filters')) {
+            $filters = $request->get('filters');
+            if (isset($filters['status'])) {
+                $status = filter_var($request->get('filters')['status'], FILTER_SANITIZE_STRING);
+                $query->where('status', $status);
+            }
+        }
+        $transactions = $query->paginate((int)$request->get('limit', 10));
+        return response()->json((new TransactionCollection($transactions))->additional($request->get('order', ['id' => 'asc'])));
     }
 
     /**
@@ -30,7 +47,7 @@ class TransactionController extends Controller
     {
         $data = $request->all();
         $validator = Validator::make($data, [
-            'provider' => 'required',
+            'provider' => 'required_without:provider_id',
             'type' => 'required',
             'amount' => 'required|numeric',
             'currency' => 'required',
@@ -69,6 +86,10 @@ class TransactionController extends Controller
 
             $transaction = $user->addTransaction($data);
 
+            if (!$transaction instanceof \App\Transaction) {
+                throw new \Exception($transaction);
+            }
+
             DB::commit();
         } catch (\Exception $exception) {
             DB::rollBack();
@@ -77,7 +98,7 @@ class TransactionController extends Controller
 
         $transaction = $transaction->load('user');
 
-        return response()->json(new Transaction($transaction));
+        return response()->json(new TransactionUser($transaction));
     }
 
     /**

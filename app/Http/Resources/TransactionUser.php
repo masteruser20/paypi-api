@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class Transaction extends JsonResource
+class TransactionUser extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -20,8 +20,7 @@ class Transaction extends JsonResource
             'type' => $this->type,
             'amount' => $this->amount,
             'currency' => $this->currency,
-            'user' => $this->user->id,
-            'status' => $this->status
+            'user' => $this->user,
         ];
     }
 }

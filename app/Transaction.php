@@ -27,6 +27,7 @@ class Transaction extends Model
         'amount',
         'currency',
         'status',
+        'user_id'
     ];
 
     /**
@@ -43,6 +44,10 @@ class Transaction extends Model
      * @return mixed
      */
     public function getProviderIdAttribute($value) {
-        return PaymentProvider::find($value)->name;
+        if($this->exists) {
+            return PaymentProvider::find($value)->name;
+        }
+
+        return $value;
     }
 }
