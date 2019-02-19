@@ -29,4 +29,16 @@ Route::get('methods', function () {
     );
 });
 
+Route::get('user/{id}', function ($userId) {
+    if (!is_numeric($userId)) {
+        return response()->status(400);
+    }
+
+    if ($user = \App\User::find($userId)) {
+        return response()->json($user->toArray());
+    }
+
+    return response()->noContent(404);
+});
+
 Route::resource('transactions', 'TransactionController');
