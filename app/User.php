@@ -12,6 +12,8 @@ class User extends Model
      */
     protected $table = 'user';
 
+    protected $appends = ['state'];
+
     /**
      * @var array
      */
@@ -59,5 +61,9 @@ class User extends Model
             'currency' => $data['currency'],
             'status' => \App\Transaction::STATUSES[array_rand(\App\Transaction::STATUSES)]
         ]);
+    }
+
+    public function getStateAttribute() {
+        return '';
     }
 }
