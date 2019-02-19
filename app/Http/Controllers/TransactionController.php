@@ -34,6 +34,7 @@ class TransactionController extends Controller
                 $query->where('status', $status);
             }
         }
+
         $transactions = $query->paginate((int)$request->get('limit', 10));
         return response()->json((new TransactionCollection($transactions))->additional($request->get('order', ['id' => 'asc'])));
     }
