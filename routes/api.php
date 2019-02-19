@@ -29,7 +29,7 @@ Route::get('methods', function () {
     );
 });
 
-Route::get('user/{id}', function ($userId) {
+Route::get('users/{id}', function ($userId) {
     if (!is_numeric($userId)) {
         return response()->status(400);
     }
@@ -38,7 +38,8 @@ Route::get('user/{id}', function ($userId) {
         return response()->json($user->toArray());
     }
 
-    return response()->noContent(404);
+    return response()
+        ->json("User doesn't exists", 404);
 });
 
 Route::resource('transactions', 'TransactionController');
