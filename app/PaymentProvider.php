@@ -25,4 +25,18 @@ class PaymentProvider extends Model
             Cache::forget('payment_methods');
         });
     }
+
+    public function validateAdditionalData(array $attributes): bool {
+        if(!$attributes || empty($attributes)) {
+            return false;
+        }
+
+        foreach($this->additional_data as $fields) {
+            if($fields['required'] && empty($attributes[$fields['name']])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

@@ -48,10 +48,17 @@ class User extends Model
         if (isset($data['provider_id'])) {
             $provider = PaymentProvider::find($data['provider_id']);
         } else {
-            $provider = PaymentProvider::select('id')->where('name', $data['provider'])->first();
+            $provider = PaymentProvider::where('name', $data['provider'])->first();
             if (!$provider) {
                 return response()->json(['error' => "Payment provider doesn't exists"], 500);
             }
+        }
+
+        $validAdditionalData = $provider->validateAdditionalData($data['attributes']);
+        if (!$validAdditionalData) {
+            $status = 'cancelled';
+        } else {
+            $status = \App\Transaction::STATUSES[array_rand(\App\Transaction::STATUSES)];
         }
 
         return $this->transactions()->create([
@@ -59,7 +66,7 @@ class User extends Model
             'type' => $data['type'],
             'amount' => $data['amount'],
             'currency' => $data['currency'],
-            'status' => \App\Transaction::STATUSES[array_rand(\App\Transaction::STATUSES)]
+            'status' => $status
         ]);
     }
 
