@@ -21,7 +21,6 @@ class CreateTransaction extends Migration
             $table->string('currency', 255);
             $table->string('status', 255);
             $table->integer('user_id')->unsigned()->index();
-            $table->timestamps();
 
             $table->foreign('user_id')
                 ->references('id')

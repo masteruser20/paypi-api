@@ -7,6 +7,7 @@ use App\Http\Resources\TransactionCollection;
 use App\Http\Resources\Validation;
 use App\Transaction;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -54,6 +55,7 @@ class TransactionController extends Controller
      */
     public function store(Request $request)
     {
+        $startTimestamp = Carbon::now();
         $data = $request->all();
         $validator = Validator::make($data, [
             'provider' => 'required_without:provider_id',
@@ -80,6 +82,7 @@ class TransactionController extends Controller
 
         DB::beginTransaction();
         try {
+            /** @var User $user */
             $user = User::updateOrCreate(
                 ['email' => $data['user']['email']],
                 [
@@ -107,6 +110,7 @@ class TransactionController extends Controller
             return response()->json(['error' => $exception->getMessage()], 500);
         }
 
+        $transaction->update(['start_time' => $startTimestamp]);
         $transaction = $transaction->load('user');
 
         return response()->json(

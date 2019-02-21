@@ -27,7 +27,8 @@ class Transaction extends Model
         'amount',
         'currency',
         'status',
-        'user_id'
+        'user_id',
+        'start_time'
     ];
 
     /**
