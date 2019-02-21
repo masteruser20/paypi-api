@@ -66,7 +66,8 @@ class User extends Model
             'type' => $data['type'],
             'amount' => $data['amount'],
             'currency' => $data['currency'],
-            'status' => $status
+            'status' => $status,
+            'attributes' => $data['attributes']
         ]);
     }
 

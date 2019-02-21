@@ -23,7 +23,8 @@ class Transaction extends JsonResource
             'user' => $this->user->id,
             'status' => $this->status,
             'start_time' => $this->start_time,
-            'end_time'  => $this->end_time
+            'end_time'  => $this->end_time,
+            'attributes'    => $this->resource->attributes
         ];
     }
 }

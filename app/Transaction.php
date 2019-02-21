@@ -28,7 +28,12 @@ class Transaction extends Model
         'currency',
         'status',
         'user_id',
-        'start_time'
+        'start_time',
+        'attributes'
+    ];
+
+    protected $casts = [
+        'attributes'    => 'array'
     ];
 
     /**
