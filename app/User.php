@@ -29,6 +29,7 @@ class User extends Model
         'birthday',
     ];
 
+
     /**
      * Returns transactions created by user
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
@@ -45,6 +46,7 @@ class User extends Model
      */
     public function addTransaction(array $data)
     {
+        $attributes = [];
         if (isset($data['provider_id'])) {
             $provider = PaymentProvider::find($data['provider_id']);
         } else {
@@ -54,11 +56,14 @@ class User extends Model
             }
         }
 
-        $validAdditionalData = $provider->validateAdditionalData($data['attributes']);
-        if (!$validAdditionalData) {
+        $status = \App\Transaction::STATUSES[array_rand(\App\Transaction::STATUSES)];
+        if(isset($data['attributes'])) {
+            $attributes = $data['attributes'];
             $status = 'cancelled';
-        } else {
-            $status = \App\Transaction::STATUSES[array_rand(\App\Transaction::STATUSES)];
+            $validAdditionalData = $provider->validateAdditionalData($attributes);
+            if (!$validAdditionalData) {
+                $status = 'cancelled';
+            }
         }
 
         return $this->transactions()->create([
@@ -67,7 +72,7 @@ class User extends Model
             'amount' => $data['amount'],
             'currency' => $data['currency'],
             'status' => $status,
-            'attributes' => $data['attributes']
+            'attributes' => $attributes
         ]);
     }
 

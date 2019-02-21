@@ -36,6 +36,8 @@ class Transaction extends Model
         'attributes'    => 'array'
     ];
 
+    public $timestamps = false;
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      * Get the user that created the transaction.

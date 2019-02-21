@@ -31,9 +31,12 @@ class TransactionTest extends TestCase
         $response = $this->post('/api/transactions', $transaction->toArray());
         $response->assertStatus(422)
             ->assertJsonStructure([
-                'provider',
-                'amount',
-                'user.email'
+                'validation_messages' => [
+                    'provider',
+                    'user' => [
+                        'email'
+                    ]
+                ]
             ]);
     }
 
@@ -63,7 +66,7 @@ class TransactionTest extends TestCase
      */
     public function it_should_returns_correct_transaction_structure()
     {
-       $this->generateTransactions(1);
+        $this->generateTransactions(1);
         $transactionId = Transaction::first()->id;
         $response = $this->get('/api/transactions/' . $transactionId);
         $response->assertStatus(200)
