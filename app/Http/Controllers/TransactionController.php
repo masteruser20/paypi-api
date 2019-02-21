@@ -66,7 +66,7 @@ class TransactionController extends Controller
             'user.first_name' => 'required',
             'user.last_name' => 'required',
             'user.gender' => 'required',
-            'user.email' => 'required|email',
+            'user.email' => 'required',
             'user.address' => 'required',
             'user.city' => 'required',
             'user.zip' => 'required',

@@ -17,7 +17,7 @@ class CreateTransaction extends Migration
             $table->increments('id');
             $table->integer('provider_id')->unsigned()->index();
             $table->string('type', 255);
-            $table->float('amount');
+            $table->float('amount', 10);
             $table->string('currency', 255);
             $table->string('status', 255);
             $table->integer('user_id')->unsigned()->index();

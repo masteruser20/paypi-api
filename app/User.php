@@ -59,11 +59,12 @@ class User extends Model
         $status = \App\Transaction::STATUSES[array_rand(\App\Transaction::STATUSES)];
         if(isset($data['attributes'])) {
             $attributes = $data['attributes'];
-            $status = 'cancelled';
             $validAdditionalData = $provider->validateAdditionalData($attributes);
             if (!$validAdditionalData) {
                 $status = 'cancelled';
             }
+        } else {
+            $status = 'cancelled';
         }
 
         return $this->transactions()->create([
