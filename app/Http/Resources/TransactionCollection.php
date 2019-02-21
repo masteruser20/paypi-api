@@ -19,8 +19,9 @@ class TransactionCollection extends ResourceCollection
             'pagination' => [
                 'limit' => $this->perPage(),
                 'page'  => $this->currentPage(),
-                'order' => $this->additional
-            ]
+                'order' => $this->additional['order']
+            ],
+            'count' => $this->additional['count']
         ];
     }
 }
