@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\TransactionUser;
 use App\Http\Resources\TransactionCollection;
+use App\Http\Resources\Validation;
 use App\Transaction;
 use App\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -21,13 +21,13 @@ class TransactionController extends Controller
     public function index(Request $request)
     {
         $query = \App\Transaction::query();
-        if ($request->has('order')) {
-            $key = filter_var(array_key_first($request->get('order')), FILTER_SANITIZE_STRING);
+        if ($request->get('order')) {
+            $key = filter_var(key($request->get('order')), FILTER_SANITIZE_STRING);
             $value = filter_var(array_first($request->get('order')), FILTER_SANITIZE_STRING);
             $query->orderBy($key, $value);
         }
 
-        if ($request->has('filters')) {
+        if ($request->get('filters')) {
             $filters = $request->get('filters');
             if (isset($filters['status'])) {
                 $status = filter_var($request->get('filters')['status'], FILTER_SANITIZE_STRING);
@@ -36,7 +36,14 @@ class TransactionController extends Controller
         }
 
         $transactions = $query->paginate((int)$request->get('limit', 10));
-        return response()->json((new TransactionCollection($transactions))->additional($request->get('order', ['id' => 'asc'])));
+        return response()->json(
+            (new TransactionCollection($transactions))->additional(
+                [
+                    'order' => $request->get('order', ['id' => 'asc']),
+                    'count' => Transaction::count()
+                ]
+            )
+        );
     }
 
     /**
@@ -51,7 +58,7 @@ class TransactionController extends Controller
         $validator = Validator::make($data, [
             'provider' => 'required_without:provider_id',
             'type' => 'required',
-            'amount' => 'required|numeric',
+            'amount' => 'required',
             'currency' => 'required',
             'user' => 'required|array',
             'user.first_name' => 'required',
@@ -62,11 +69,13 @@ class TransactionController extends Controller
             'user.city' => 'required',
             'user.zip' => 'required',
             'user.country_code' => 'required',
-            'user.birthday' => 'required|date'
+            'user.birthday' => 'required'
+        ], [
+            'required' => 'Value is required and can\'t be empty'
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            return response()->json(new Validation($validator->errors()), 422);
         }
 
         DB::beginTransaction();
@@ -100,7 +109,9 @@ class TransactionController extends Controller
 
         $transaction = $transaction->load('user');
 
-        return response()->json(new TransactionUser($transaction));
+        return response()->json(
+            new TransactionUser($transaction)
+        );
     }
 
     /**
